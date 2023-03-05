@@ -34,12 +34,20 @@ class TasksController extends Controller
     // postでtasks/にアクセスされた場合の「新規登録処理」
     public function store(Request $request)
     {
-        //
+        
+        
+        $request->validate([
+            'content' => 'required',
+            'status' => 'required|max:10',
+        ]);
                 // メッセージを作成
         $task = new Task;
         $task->content = $request->content;
+        $task->status = $request->status;
         $task->save();
 
+
+        
         // トップページへリダイレクトさせる
         return redirect('/');
     }
@@ -78,6 +86,7 @@ class TasksController extends Controller
         $task = task::findOrFail($id);
         // メッセージを更新
         $task->content = $request->content;
+        $task->status = $request->status;
         $task->save();
 
         // トップページへリダイレクトさせる

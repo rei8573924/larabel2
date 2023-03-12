@@ -1,28 +1,33 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TasksController;
-
-// デフォルトのコメント部分は省略
+use App\Http\Controllers\UsersController; // 追記
+use App\Http\Controllers\TasksController; //追記
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
 
 Route::get('/', [TasksController::class, 'index']);
-Route::resource('tasks', TasksController::class);
 
-/*
-// CRUD
-// メッセージの個別詳細ページ表示
-Route::get('tasks/{id}', [TasksController::class, 'show']);
-// メッセージの新規登録を処理（新規登録画面を表示するためのものではありません）
-Route::post('tasks', [TasksController::class, 'store']);
-// メッセージの更新処理（編集画面を表示するためのものではありません）
-Route::put('tasks/{id}', [TasksController::class, 'update']);
-// メッセージを削除
-Route::delete('tasks/{id}', [TasksController::class, 'destroy']);
+Route::get('/dashboard', [TasksController::class, 'index'])->middleware(['auth']);
 
-// index: showの補助ページ
-Route::get('tasks', [TasksController::class, 'index'])->name('tasks.index');
-// create: 新規作成用のフォームページ
-Route::get('tasks/create', [TasksController::class, 'index'])->name('tasks.index');
-// edit: 更新用のフォームページ
-Route::get('tasks/{id}/edit', [TasksController::class, 'edit'])->name('tasks.edit');
-*/
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
+Route::group(['middleware' => ['auth']], function () {                                    // 追記
+    Route::resource('users', UsersController::class, ['only' => ['index', 'show']]);     // 追記
+    Route::resource('tasks', TasksController::class, ['only' => ['index','store','show' ,'destroy','edit','update','create']]);
+ 
+});          

@@ -13,14 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tasks', function (Blueprint $table) {
+        Schema::create('favorite', function (Blueprint $table) {
             $table->id();
-            $table->string('content');    // contentカラム追加
             $table->unsignedBigInteger('user_id');
-            $table->string('status',10);
+            $table->unsignedBigInteger('favorite_id');
             $table->timestamps();
+            
             // 外部キー制約
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('favorite_id')->references('id')->on('microposts')->onDelete('cascade');
+
+            // user_idとfollow_idの組み合わせの重複を許さない
+            $table->unique(['user_id', 'favorite_id']);
+
         });
     }
 
@@ -31,7 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tasks');
-        $table->dropForeign(['user_id']);
+        Schema::dropIfExists('favorite');
     }
 };

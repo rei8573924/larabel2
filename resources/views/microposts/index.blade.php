@@ -5,24 +5,23 @@
 <!-- ここにページ毎のコンテンツを書く -->
 
     <div class="prose ml-4">
-        <h2>タスク一覧</h2>
+        <h2>Post一覧</h2>
     </div>
 
-    @if (isset($tasks))
+    @if (isset($microposts))
         <table class="table table-zebra w-full my-4">
             <thead>
                 <tr>
                     <th>id</th>
-                    <th>タスク</th>
-                    <th>ステータス</th>
+                    
+                    <th>内容</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($tasks as $task)
+                @foreach ($microposts as $micropost)
                 <tr>
-                    <td><a class="link link-hover text-info" href="{{ route('tasks.show', $task->id) }}">{{ $task->id }}</a></td>
-                    <td>{{ $task->content }}</td>
-                    <td>{{ $task->status }}</td>
+                    <td><a class="link link-hover text-info" href="{{ route('microposts.show', $micropost->id) }}">{{ $micropost->id }}</a></td>
+                    <td>{{ $micropost->content }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -30,6 +29,6 @@
     @endif
     
     {{-- メッセージ作成ページへのリンク --}}                                              
-    <a class="btn btn-primary" href="{{ route('tasks.create') }}">タスク作成</a> 
+    <a class="btn btn-primary" href="{{ route('microposts.create') }}">Post作成</a> 
     
 @endsection

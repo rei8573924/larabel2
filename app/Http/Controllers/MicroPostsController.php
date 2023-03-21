@@ -4,48 +4,51 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\Models\Task;   
-class TasksController extends Controller
+use App\Models\MicroPost;   
+
+class MicropostsController extends Controller
 {
-    // getでtasks/にアクセスされた場合の「一覧表示処理」
+    // getでmicroposts/にアクセスされた場合の「一覧表示処理」
     public function index()
     {
+        
         if (\Auth::check()) { // 認証済みの場合
-           
+           $data = [];
       // 認証済みユーザを取得
             $user = \Auth::user();
-           $tasks = $user->tasks()->orderBy('id', 'asc')->paginate(10);
-
+          // $microposts = $user->microposts()->orderBy('id', 'asc')->paginate(10);
+        $microposts = MicroPost::all();         // 追加
         // メッセージ一覧ビューでそれを表示
-        return view('tasks.index', [     // 追加
-            'tasks' => $tasks,        // 追加
-        ]);                                 // 追加
-  
- 
+           $data = [
+                'user' => $user,
+                'microposts' => $microposts,
+            ];
+              // dashboardビューでそれらを表示
+        return view('dashboard', $data);
        
         }
-         return redirect('dashboard');
+      return view('dashboard');
         
     }
 
-    // getでtasks/createにアクセスされた場合の「新規登録画面表示処理」
+    // getでmicroposts/createにアクセスされた場合の「新規登録画面表示処理」
     public function create()
     {
         //
         if (\Auth::check()) { // 認証済みの場合
         
-        $task = new Task;
+        $micropost = new MicroPost;
 
         // メッセージ作成ビューを表示
-        return view('tasks.create', [
-            'task' => $task,
+        return view('microposts.create', [
+            'micropost' => $micropost,
         ]);
             }
                     // トップページへリダイレクトさせる
         return redirect('/');
     }
 
-    // postでtasks/にアクセスされた場合の「新規登録処理」
+    // postでmicroposts/にアクセスされた場合の「新規登録処理」
     public function store(Request $request)
     {
         
@@ -53,14 +56,12 @@ class TasksController extends Controller
         
         $request->validate([
             'content' => 'required',
-            'status' => 'required|max:10',
         ]);
                 // メッセージを作成
-        $task = new Task;
-        $task->content = $request->content;
-        $task->status = $request->status;
-        $task->user_id=\Auth::id();
-        $task->save();
+        $micropost = new MicroPost;
+        $micropost->content = $request->content;
+        $micropost->user_id=\Auth::id();
+        $micropost->save();
 
    // トップページへリダイレクトさせる
         return redirect('/');
@@ -70,7 +71,7 @@ class TasksController extends Controller
         return redirect('/');
     }
 
-    // getでtasks/（任意のid）にアクセスされた場合の「取得表示処理」
+    // getでmicroposts/（任意のid）にアクセスされた場合の「取得表示処理」
     public function show($id)
     {
         
@@ -79,12 +80,12 @@ class TasksController extends Controller
            
             // ユーザの投稿の一覧を作成日時の降順で取得
             // （後のChapterで他ユーザの投稿も取得するように変更しますが、現時点ではこのユーザの投稿のみ取得します）
-            $task = Task::findOrFail($id);
-            if($task->user_id== \Auth::id()){
+            $micropost = MicroPost::findOrFail($id);
+            if($micropost->user_id== \Auth::id()){
             // メッセージ詳細ビューでそれを表示
       // メッセージ詳細ビューでそれを表示
-                return view('tasks.show', [
-                    'task' => $task,
+                return view('microposts.show', [
+                    'micropost' => $micropost,
                 ]);
             }
                     // トップページへリダイレクトさせる
@@ -98,29 +99,29 @@ class TasksController extends Controller
         return redirect('/');
         /*
             // idの値でメッセージを検索して取得
-        $task = Task::findOrFail($id);
+        $micropost = micropost::findOrFail($id);
 
         // メッセージ詳細ビューでそれを表示
-        return view('tasks.show', [
-            'task' => $task,
+        return view('microposts.show', [
+            'micropost' => $micropost,
         ]);
         
         */
         
     }
 
-    // getでtasks/（任意のid）/editにアクセスされた場合の「更新画面表示処理」
+    // getでmicroposts/（任意のid）/editにアクセスされた場合の「更新画面表示処理」
     public function edit($id)
     {
           if (\Auth::check()) { // 認証済みの場合
         
         // idの値でメッセージを検索して取得
-        $task = task::findOrFail($id);
+        $micropost = MicroPost::findOrFail($id);
         
-        if (\Auth::id() === $task->user_id) {
+        if (\Auth::id() === $micropost->user_id) {
             // メッセージ編集ビューでそれを表示
-            return view('tasks.edit', [
-                'task' => $task,
+            return view('microposts.edit', [
+                'micropost' => $micropost,
             ]);
         }
                 // トップページへリダイレクトさせる
@@ -130,7 +131,7 @@ class TasksController extends Controller
         return redirect('/');
     }
 
-    // putまたはpatchでtasks/（任意のid）にアクセスされた場合の「更新処理」
+    // putまたはpatchでmicroposts/（任意のid）にアクセスされた場合の「更新処理」
     public function update(Request $request, $id)
     {
         
@@ -141,11 +142,10 @@ class TasksController extends Controller
             'status' => 'required|max:10',
         ]);
                 // idの値でメッセージを検索して取得
-        $task = task::findOrFail($id);
+        $micropost = MicroPost::findOrFail($id);
         // メッセージを更新
-        $task->content = $request->content;
-        $task->status = $request->status;
-        $task->save();
+        $micropost->content = $request->content;
+        $micropost->save();
             // トップページへリダイレクトさせる
         return redirect('/');
             
@@ -154,17 +154,17 @@ class TasksController extends Controller
         return redirect('/');
     }
 
-    // deleteでtasks/（任意のid）にアクセスされた場合の「削除処理」
+    // deleteでmicroposts/（任意のid）にアクセスされた場合の「削除処理」
     public function destroy($id)
     {
         if (\Auth::check()) { // 認証済みの場合
         
         // idの値で投稿を検索して取得
-        $task = task::findOrFail($id);
+        $micropost = MicroPost::findOrFail($id);
         
            // 認証済みユーザ（閲覧者）がその投稿の所有者である場合は投稿を削除
-        if (\Auth::id() === $task->user_id) {
-            $task->delete();
+        if (\Auth::id() === $micropost->user_id) {
+            $micropost->delete();
             return redirect('/');
         }
 }

@@ -5,16 +5,16 @@
 <!-- ここにページ毎のコンテンツを書く -->
 
     <div class="prose ml-4">
-        <h2>タスク作成用ページ</h2>
+        <h2>Post作成用ページ</h2>
     </div>
 
     <div class="flex justify-center">
-        <form method="POST" action="{{ route('tasks.store') }}" class="w-1/2">
+        <form method="POST" action="{{ route('microposts.store') }}" class="w-1/2">
             @csrf
 
                 <div class="form-control my-4">
                     <label for="content" class="label">
-                        <span class="label-text">タスク:</span>
+                        <span class="label-text">Post:</span>
                     </label>
                     <input type="text" name="content" class="input input-bordered w-full">
                     <label for="status" class="label">

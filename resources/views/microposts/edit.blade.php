@@ -4,23 +4,23 @@
 
 <!-- ここにページ毎のコンテンツを書く -->
  <div class="prose ml-4">
-        <h2>id: {{ $task->id }} のタスク編集ページ</h2>
+        <h2>id: {{ $micropost->id }} のPost編集ページ</h2>
     </div>
 
     <div class="flex justify-center">
-        <form method="POST" action="{{ route('tasks.update', $task->id) }}" class="w-1/2">
+        <form method="POST" action="{{ route('microposts.update', $micropost->id) }}" class="w-1/2">
             @csrf
             @method('PUT')
 
                 <div class="form-control my-4">
                     <label for="content" class="label">
-                        <span class="label-text">タスク:</span>
+                        <span class="label-text">Post:</span>
                     </label>
-                    <input type="text" name="content" value="{{ $task->content }}" class="input input-bordered w-full">
+                    <input type="text" name="content" value="{{ $micropost->content }}" class="input input-bordered w-full">
                     <label for="status" class="label">
                         <span class="label-text">ステータス:</span>
                     </label>
-                    <input type="text" name="status" value="{{ $task->status }}" class="input input-bordered w-full">
+                    <input type="text" name="status" value="{{ $micropost->status }}" class="input input-bordered w-full">
                 </div>
 
             <button type="submit" class="btn btn-primary btn-outline">更新</button>

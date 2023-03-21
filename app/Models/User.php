@@ -42,8 +42,60 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
     
-    public function tasks()
+    public function microposts()
     {
-        return $this->hasMany(Task::class);
+        return $this->hasMany(MicroPost::class);
     }
+    
+        /**
+     * このユーザがお気に入り中のポスト     */
+    public function favoritePosts()
+    {
+        return $this->belongsToMany(MicroPost::class, 'micropost_user', 'user_id', 'favorite_id')->withTimestamps();
+    }
+    
+    
+    public function favorite($micropostId)
+    {
+        $exist = $this->is_favorite($micropostId);
+       // $its_me = $this->id == $userId;
+        
+        if ($exist) {
+            return false;
+        } else {
+            $this->favoritePosts()->attach($micropostId);
+            return true;
+        }
+    }
+    
+    /**
+     * $userIdで指定されたユーザをアンフォローする。
+     * 
+     * @param  int $usereId
+     * @return bool
+     */
+    public function unfavorite($micropostId)
+    {
+        $exist = $this->is_favorite($micropostId);
+        //$its_me = $this->id == $userId;
+        
+        if ($exist) {
+            $this->favoritePosts()->detach($micropostId);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * 指定された$userIdのユーザをこのユーザがフォロー中であるか調べる。フォロー中ならtrueを返す。
+     * 
+     * @param  int $userId
+     * @return bool
+     */
+    public function is_favorite($micropostId)
+    {
+        return $this->favoritePosts()->where('favorite_id', $micropostId)->exists();
+    }
+
 }
